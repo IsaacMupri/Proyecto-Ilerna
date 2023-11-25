@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "912093279532",
+    "project_id": "proyecto-ilerna-684d0",
+    "storage_bucket": "proyecto-ilerna-684d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912093279532:android:7cdd12501c4b56c6c6e889",
+        "android_client_info": {
+          "package_name": "com.example.proyectoilerna"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLjG5pHX4appFeUUtlu9kEBZgj7e2hpHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
