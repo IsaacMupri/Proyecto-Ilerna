@@ -4,13 +4,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.Screens.Login
 import com.Screens.Registro
+import com.example.proyectoilerna.util.AuthManager
 
 @Composable
 fun NavHost() {
     val navController = rememberNavController()
+    val authManager = AuthManager()
 
     NavHost(navController = navController, startDestination = "Login") {
-        composable("Login") { Login(navController) }
-        composable("Registro") { Registro(navController) }
+        composable("Login") { Login(navController, authManager) }
+        composable("Registro") { Registro(navController, authManager) }
     }
 }

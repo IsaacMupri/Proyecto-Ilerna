@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -24,13 +26,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -111,28 +116,41 @@ fun ClickableTextComponentRegistro(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun textField(labelValue: String) {
+fun textField(
+    labelValue: String,
+    onValueChanged: (String) -> Unit
+) {
     val textValue = remember {
         mutableStateOf("")
     }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     OutlinedTextField(
         modifier = Modifier
-            .fillMaxWidth()
-            .clip(componentShapes.small),
+            .fillMaxWidth(),
         label = { Text(text = labelValue) },
         value = textValue.value,
         onValueChange = {
             textValue.value = it
+            onValueChanged(it)
         },
-        maxLines = 1
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+            }
+        )
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun PasswordTextField(labelValue: String) {
+fun PasswordTextField(labelValue: String, onValueChanged: (String) -> Unit) {
     val textValue = remember {
         mutableStateOf("")
     }
@@ -141,6 +159,8 @@ fun PasswordTextField(labelValue: String) {
         mutableStateOf(false)
     }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,6 +168,7 @@ fun PasswordTextField(labelValue: String) {
         value = textValue.value,
         onValueChange = {
             textValue.value = it
+            onValueChanged(it) // Llamar a la función proporcionada cuando cambia el valor
         },
         label = { Text(text = labelValue) },
         visualTransformation = if (passwordVisibility.value) {
@@ -165,8 +186,16 @@ fun PasswordTextField(labelValue: String) {
                 Icon(imageVector = icon, contentDescription = null)
             }
         },
-
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+            }
         )
+    )
 }
 
 @Composable
