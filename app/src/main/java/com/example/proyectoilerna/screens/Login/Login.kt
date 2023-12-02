@@ -101,6 +101,7 @@ private suspend fun LogearUsuario(
             is AuthRes.Success -> {
                 Toast.makeText(context, "Login exitoso", Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
+                navController.navigate("com.example.proyectoilerna.screens.Pedidos.PedidoScreen")
             }
 
             is AuthRes.Error -> {
