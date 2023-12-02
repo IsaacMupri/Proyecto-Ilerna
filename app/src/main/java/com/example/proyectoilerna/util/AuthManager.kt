@@ -1,5 +1,6 @@
 package com.example.proyectoilerna.util
 
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -12,7 +13,7 @@ sealed class AuthRes<out T> {
     data class Error(val errorMesage: String) : AuthRes<Nothing>()
 }
 
-class AuthManager {
+class AuthManager(private val context: Context) {
     private val auth: FirebaseAuth by lazy { Firebase.auth }
 
     suspend fun createUserWithEmailAndPassword(
@@ -37,5 +38,9 @@ class AuthManager {
         } catch (e: Exception) {
             AuthRes.Error(e.message ?: "Error al iniciar sesión")
         }
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
     }
 }
