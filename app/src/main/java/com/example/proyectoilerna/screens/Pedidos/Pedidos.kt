@@ -11,9 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,13 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectoilerna.mode.Pedido
 import com.example.proyectoilerna.mode.Producto
+import com.example.proyectoilerna.util.AuthManager
 import com.example.proyectoilerna.util.DataViewModel
 
 @Composable
-fun PedidoScreen(
-    dataViewModel: DataViewModel = viewModel()
-) {
+fun PedidoScreen(dataViewModel: DataViewModel = viewModel()) {
     val productList = dataViewModel.state.value
 
     Column(
@@ -45,10 +46,30 @@ fun PedidoScreen(
             textAlign = TextAlign.Center
         )
 
-        LazyColumn {
-            items(productList) { product ->
-                ProductoCard(product = product)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            LazyColumn {
+                items(productList) { product ->
+                    ProductoCard(product = product)
+                }
             }
+        }
+        Button(
+            onClick = {
+                val productosSeleccionados = PedidoViewModel().getProductosSeleccionados()
+                val idUsuario = AuthManager().getCurrentUser()
+                val nuevoPedido = Pedido(uid = idUsuario, tblProducto = productosSeleccionados)
+                println(productosSeleccionados)
+//                dataViewModel.insertarPedido(nuevoPedido)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Text(text = "Enviar Pedido")
         }
     }
 }
@@ -112,26 +133,32 @@ fun ProductoCard(product: Producto) {
 }
 
 class PedidoViewModel : ViewModel() {
-    private val productosSeleccionados = mutableStateOf<List<Pair<Producto, Int>>>(emptyList())
+    private var productosSeleccionados = mutableStateListOf<Pair<String, Int>>()
+
 
     fun modProductoSel(producto: Producto, cantidad: Int) {
-        val listaActualizada = productosSeleccionados.value.toMutableList()
-        val key = producto.key
-        val productoExistente = listaActualizada.any { it.first.key == key }
+        val listaActualizada = productosSeleccionados.toMutableList()
 
+        val denominacion = producto.denominacion
+        println("Cantidad: $cantidad")
+        println("Lista actualizada antes: $listaActualizada")
+
+        listaActualizada.removeAll { it.first == denominacion }
         if (cantidad > 0) {
-            if (productoExistente) {
-                listaActualizada.firstOrNull { it.first.key == key }?.let {
-                    val index = listaActualizada.indexOf(it)
-                    listaActualizada[index] = Pair(producto, cantidad)
-                }
-            } else {
-                listaActualizada.add(Pair(producto, cantidad))
-            }
-        } else if (cantidad == 0) {
-            listaActualizada.removeAll { it.first.key == key }
+            listaActualizada.add(Pair(denominacion, cantidad))
         }
-        productosSeleccionados.value = listaActualizada
+
+        productosSeleccionados.clear()
+        productosSeleccionados.addAll(listaActualizada)
+        productosSeleccionados =
+            productosSeleccionados.toMutableStateList() // Actualizar la lista con el nuevo estado
+
+        println("Lista actualizada después: $productosSeleccionados")
+    }
+
+
+    fun getProductosSeleccionados(): List<Pair<String, Int>> {
+        return productosSeleccionados
     }
 }
 
@@ -139,7 +166,7 @@ class PedidoViewModel : ViewModel() {
 @Composable
 fun PedidoScreenPreview() {
     val sampleProducts = List(5) {
-        Producto("Producto $it", "")
+        Producto("Producto $it")
     }
     PedidoScreen(dataViewModel = DataViewModel().apply {
         state.value = sampleProducts

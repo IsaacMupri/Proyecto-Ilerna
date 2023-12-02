@@ -47,13 +47,19 @@ suspend fun getProductos(): List<Producto> {
 }
 
 suspend fun insertPedido(pedido: Pedido) {
-    val db = FirebaseFirestore.getInstance()
-
     try {
-        db.collection("pedido")
-            .add(pedido)
-            .await()
-    } catch (e: FirebaseFirestoreException) {
-        Log.d("error", "insertPedido: $e")
+        val db = FirebaseFirestore.getInstance()
+
+        println(pedido)
+
+        db.collection("tblPedidos").document("pedido").set(pedido)
+            .addOnSuccessListener { documentReference ->
+                println("Documento insertado")
+            }
+            .addOnFailureListener { e ->
+                println("Error al insertar el documento: $e")
+            }
+    } catch (e: Exception) {
+        println("Excepción al insertar el pedido en Firestore: $e")
     }
 }

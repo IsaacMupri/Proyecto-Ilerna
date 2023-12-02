@@ -38,8 +38,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun Login(navController: NavController, auth: AuthManager) {
     val scope = rememberCoroutineScope()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("isaac.mp92@gmail.com") }
+    var password by remember { mutableStateOf("Gateway7788") }
 
     Surface(
         color = Color.White,
