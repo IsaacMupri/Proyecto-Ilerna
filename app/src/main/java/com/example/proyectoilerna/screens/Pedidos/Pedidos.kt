@@ -11,19 +11,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectoilerna.mode.Pedido
 import com.example.proyectoilerna.mode.Producto
 import com.example.proyectoilerna.util.AuthManager
 import com.example.proyectoilerna.util.DataViewModel
@@ -59,10 +55,7 @@ fun PedidoScreen(dataViewModel: DataViewModel = viewModel()) {
         }
         Button(
             onClick = {
-                val productosSeleccionados = PedidoViewModel().getProductosSeleccionados()
                 val idUsuario = AuthManager().getCurrentUser()
-                val nuevoPedido = Pedido(uid = idUsuario, tblProducto = productosSeleccionados)
-                println(productosSeleccionados)
 //                dataViewModel.insertarPedido(nuevoPedido)
             },
             modifier = Modifier
@@ -110,7 +103,6 @@ fun ProductoCard(product: Producto) {
                             if (quantity > 0) {
                                 quantity--
                             }
-                            PedidoViewModel().modProductoSel(product, quantity)
                         }
                     ) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
@@ -121,7 +113,6 @@ fun ProductoCard(product: Producto) {
                     IconButton(
                         onClick = {
                             quantity++
-                            PedidoViewModel().modProductoSel(product, quantity)
                         }
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
@@ -132,35 +123,6 @@ fun ProductoCard(product: Producto) {
     }
 }
 
-class PedidoViewModel : ViewModel() {
-    private var productosSeleccionados = mutableStateListOf<Pair<String, Int>>()
-
-
-    fun modProductoSel(producto: Producto, cantidad: Int) {
-        val listaActualizada = productosSeleccionados.toMutableList()
-
-        val denominacion = producto.denominacion
-        println("Cantidad: $cantidad")
-        println("Lista actualizada antes: $listaActualizada")
-
-        listaActualizada.removeAll { it.first == denominacion }
-        if (cantidad > 0) {
-            listaActualizada.add(Pair(denominacion, cantidad))
-        }
-
-        productosSeleccionados.clear()
-        productosSeleccionados.addAll(listaActualizada)
-        productosSeleccionados =
-            productosSeleccionados.toMutableStateList() // Actualizar la lista con el nuevo estado
-
-        println("Lista actualizada después: $productosSeleccionados")
-    }
-
-
-    fun getProductosSeleccionados(): List<Pair<String, Int>> {
-        return productosSeleccionados
-    }
-}
 
 @Preview
 @Composable
